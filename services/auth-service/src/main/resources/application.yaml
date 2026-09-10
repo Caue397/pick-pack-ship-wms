@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: auth-service
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+jwt:
+  secret: ${JWT_SECRET:dev-only-insecure-secret-please-override-via-JWT_SECRET-env-var}
+  expiration-minutes: ${JWT_EXPIRATION_MINUTES:60}
+  cookie-secure: ${JWT_COOKIE_SECURE:true}
