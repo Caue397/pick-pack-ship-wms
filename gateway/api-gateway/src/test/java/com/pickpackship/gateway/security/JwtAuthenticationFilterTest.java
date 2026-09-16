@@ -95,7 +95,7 @@ class JwtAuthenticationFilterTest {
     }
 
     @Test
-    void forwardsClaimsAsHeadersForValidToken() {
+    void forwardsRequestForValidToken() {
         String token = Jwts.builder()
                 .subject("user-1")
                 .claim("operatorId", "op-1")
@@ -115,12 +115,31 @@ class JwtAuthenticationFilterTest {
             return Mono.empty();
         }).block();
 
-        ServerHttpRequest request = forwardedRequest.get();
-        assertNotNull(request);
-        assertEquals("user-1", request.getHeaders().getFirst("X-User-Id"));
-        assertEquals("op-1", request.getHeaders().getFirst("X-Operator-Id"));
-        assertEquals("ws-1", request.getHeaders().getFirst("X-Workspace-Id"));
-        assertEquals("ADMIN", request.getHeaders().getFirst("X-User-Role"));
+        assertNotNull(forwardedRequest.get());
+    }
+
+    @Test
+    void forwardsRequestForValidTokenInCookie() {
+        String token = Jwts.builder()
+                .subject("user-1")
+                .claim("operatorId", "op-1")
+                .claim("workspaceId", "ws-1")
+                .claim("role", "ADMIN")
+                .expiration(new Date(System.currentTimeMillis() + 60_000))
+                .signWith(secretKey)
+                .compact();
+
+        MockServerWebExchange exchange = MockServerWebExchange.from(
+                MockServerHttpRequest.get("/api/orders/123")
+                        .cookie(new org.springframework.http.HttpCookie("access_token", token)));
+
+        AtomicReference<ServerHttpRequest> forwardedRequest = new AtomicReference<>();
+        filter.filter(exchange, ex -> {
+            forwardedRequest.set(ex.getRequest());
+            return Mono.empty();
+        }).block();
+
+        assertNotNull(forwardedRequest.get());
     }
 
     @Test

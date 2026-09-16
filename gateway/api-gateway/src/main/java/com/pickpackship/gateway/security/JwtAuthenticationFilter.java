@@ -1,13 +1,13 @@
 package com.pickpackship.gateway.security;
 
 import com.pickpackship.gateway.config.JwtProperties;
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
 import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.http.HttpCookie;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -24,12 +24,12 @@ import java.util.List;
 /**
  * First line of JWT validation at the edge (defense in depth — each downstream
  * service validates the signature again, independently and statelessly).
- * Rejects unauthenticated/invalid requests before they reach any service, and
- * forwards resolved claims as headers so services don't need to re-parse the token
- * just to read workspaceId/operatorId/role.
+ * Rejects unauthenticated/invalid requests before they reach any service.
  */
 @Component
 public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
+
+    private static final String ACCESS_TOKEN_COOKIE = "access_token";
 
     private static final List<PublicEndpoint> PUBLIC_ENDPOINTS = List.of(
             new PublicEndpoint(HttpMethod.POST, "/auth/signup"),
@@ -56,20 +56,12 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
         }
 
         try {
-            Claims claims = Jwts.parser()
+            Jwts.parser()
                     .verifyWith(jwtProperties.secretKey())
                     .build()
-                    .parseSignedClaims(token)
-                    .getPayload();
+                    .parseSignedClaims(token);
 
-            ServerHttpRequest mutatedRequest = request.mutate()
-                    .header("X-User-Id", claims.getSubject())
-                    .header("X-Operator-Id", claims.get("operatorId", String.class))
-                    .header("X-Workspace-Id", claims.get("workspaceId", String.class))
-                    .header("X-User-Role", claims.get("role", String.class))
-                    .build();
-
-            return chain.filter(exchange.mutate().request(mutatedRequest).build());
+            return chain.filter(exchange);
         } catch (JwtException | IllegalArgumentException ex) {
             return reject(exchange, "Invalid or expired token");
         }
@@ -92,6 +84,12 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
         if (header != null && header.startsWith("Bearer ")) {
             return header.substring(7);
         }
+
+        HttpCookie cookie = request.getCookies().getFirst(ACCESS_TOKEN_COOKIE);
+        if (cookie != null && !cookie.getValue().isBlank()) {
+            return cookie.getValue();
+        }
+
         return null;
     }
 
