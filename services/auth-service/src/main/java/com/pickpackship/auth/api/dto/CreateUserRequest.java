@@ -13,9 +13,6 @@ public record CreateUserRequest(
         @Size(min = 8, message = "password must be at least 8 characters")
         String password,
 
-        @NotBlank(message = "operatorId is required")
-        String operatorId,
-
         @NotNull(message = "role is required")
         Role role
 ) {}

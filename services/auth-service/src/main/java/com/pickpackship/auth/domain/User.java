@@ -28,7 +28,7 @@ public class User {
         UUID workspaceId,
         String userName,
         String passwordHash,
-        String operatorId,
+        UUID operatorId,
         Role role
     ) {
         User user = new User();
@@ -42,19 +42,20 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "user_id")
     private UUID userId;
 
-    @Column(nullable = false)
+    @Column(name = "workspace_id", nullable = false)
     private UUID workspaceId;
 
     @Column(nullable = false, unique = true)
     private String userName;
 
-    @Column(nullable = false)
+    @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
-    @Column(nullable = false)
-    private String operatorId;
+    @Column(name = "operator_id", nullable = false)
+    private UUID operatorId;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

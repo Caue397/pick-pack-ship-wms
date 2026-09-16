@@ -1,16 +1,13 @@
 package com.pickpackship.auth.api;
 
-import com.pickpackship.auth.api.dto.CreateUserRequest;
 import com.pickpackship.auth.api.dto.LoginRequest;
 import com.pickpackship.auth.api.dto.SignUpRequest;
-import com.pickpackship.auth.api.dto.UserResponse;
 import com.pickpackship.auth.security.CookieBearerTokenResolver;
 import com.pickpackship.auth.security.IssuedToken;
 import com.pickpackship.auth.service.AuthService;
 import jakarta.validation.Valid;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,30 +54,6 @@ public class AuthController {
         return ResponseEntity.noContent()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .build();
-    }
-
-    @PostMapping("/users")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<UserResponse> createUser(
-            @Valid @RequestBody CreateUserRequest request,
-            @AuthenticationPrincipal Jwt caller
-    ) {
-        UserResponse response = authService.createUser(request, caller);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-
-    @GetMapping("/users")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<UserResponse>> listUsers(@AuthenticationPrincipal Jwt caller) {
-        return ResponseEntity.ok(authService.listUsers(caller));
-    }
-
-    @GetMapping("/users/{userId}")
-    public ResponseEntity<UserResponse> getUser(
-            @PathVariable UUID userId,
-            @AuthenticationPrincipal Jwt caller
-    ) {
-        return ResponseEntity.ok(authService.getUser(userId, caller));
     }
 
     @DeleteMapping("/workspaces/{workspaceId}")

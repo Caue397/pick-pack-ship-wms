@@ -25,8 +25,10 @@ public class Workspace {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "workspace_id")
     private UUID workspaceId;
 
+    @Column(nullable = false)
     private String name;
 
     @CreationTimestamp
