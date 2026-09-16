@@ -1,3 +1,6 @@
 spring:
   application:
     name: order-service
+
+jwt:
+  secret: ${JWT_SECRET:dev-only-insecure-secret-please-override-via-JWT_SECRET-env-var}
