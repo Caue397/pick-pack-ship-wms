@@ -19,19 +19,19 @@ class CreateUserAuthorizationIntegrationTest extends AbstractIntegrationTest {
         ResponseEntity<Void> signUpResponse = restTemplate.postForEntity("/auth/signup", signUp, Void.class);
         String adminCookie = extractAccessTokenCookie(signUpResponse);
 
-        CreateUserRequest createPicker = new CreateUserRequest("picker.acme", "pickerPassword1", "OP-001", Role.PICKER);
+        CreateUserRequest createPicker = new CreateUserRequest("picker.acme", "pickerPassword1", Role.PICKER);
         HttpEntity<CreateUserRequest> createPickerRequest = authenticatedJsonRequest(adminCookie, createPicker);
         ResponseEntity<Void> createPickerResponse =
-                restTemplate.postForEntity("/auth/users", createPickerRequest, Void.class);
+                restTemplate.postForEntity("/auth/user", createPickerRequest, Void.class);
         assertThat(createPickerResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
         LoginRequest pickerLogin = new LoginRequest("picker.acme", "pickerPassword1");
         ResponseEntity<Void> pickerLoginResponse = restTemplate.postForEntity("/auth/login", pickerLogin, Void.class);
         String pickerCookie = extractAccessTokenCookie(pickerLoginResponse);
 
-        CreateUserRequest anotherUser = new CreateUserRequest("checker.acme", "checkerPassword1", "OP-002", Role.CHECKER);
+        CreateUserRequest anotherUser = new CreateUserRequest("checker.acme", "checkerPassword1", Role.CHECKER);
         HttpEntity<CreateUserRequest> forbiddenRequest = authenticatedJsonRequest(pickerCookie, anotherUser);
-        ResponseEntity<String> response = restTemplate.postForEntity("/auth/users", forbiddenRequest, String.class);
+        ResponseEntity<String> response = restTemplate.postForEntity("/auth/user", forbiddenRequest, String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     }

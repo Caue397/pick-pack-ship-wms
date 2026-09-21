@@ -30,7 +30,7 @@ class GetUserIntegrationTest extends AbstractIntegrationTest {
     @Test
     void nonAdminCannotViewAnotherUser() {
         String adminCookie = signUpAndExtractCookie("Acme Logistics", "admin.acme", "adminPassword1");
-        createUser(adminCookie, "picker.acme", "pickerPassword1", "OP-001", Role.PICKER);
+        createUser(adminCookie, "picker.acme", "pickerPassword1", Role.PICKER);
         UUID adminId = userRepository.findByUserName("admin.acme").orElseThrow().getUserId();
 
         LoginRequest pickerLogin = new LoginRequest("picker.acme", "pickerPassword1");
@@ -38,7 +38,7 @@ class GetUserIntegrationTest extends AbstractIntegrationTest {
         String pickerCookie = extractAccessTokenCookie(pickerLoginResponse);
 
         ResponseEntity<String> response = restTemplate.exchange(
-                "/auth/users/" + adminId, HttpMethod.GET, authenticatedRequest(pickerCookie), String.class);
+                "/auth/user/" + adminId, HttpMethod.GET, authenticatedRequest(pickerCookie), String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     }
@@ -46,7 +46,7 @@ class GetUserIntegrationTest extends AbstractIntegrationTest {
     @Test
     void adminCanViewAnotherUserFromSameWorkspace() {
         String adminCookie = signUpAndExtractCookie("Acme Logistics", "admin.acme", "adminPassword1");
-        createUser(adminCookie, "picker.acme", "pickerPassword1", "OP-001", Role.PICKER);
+        createUser(adminCookie, "picker.acme", "pickerPassword1", Role.PICKER);
         UUID pickerId = userRepository.findByUserName("picker.acme").orElseThrow().getUserId();
 
         ResponseEntity<UserResponse> response = getUser(adminCookie, pickerId);
@@ -62,7 +62,7 @@ class GetUserIntegrationTest extends AbstractIntegrationTest {
         UUID globexAdminId = userRepository.findByUserName("admin.globex").orElseThrow().getUserId();
 
         ResponseEntity<String> response = restTemplate.exchange(
-                "/auth/users/" + globexAdminId, HttpMethod.GET, authenticatedRequest(adminAcmeCookie), String.class);
+                "/auth/user/" + globexAdminId, HttpMethod.GET, authenticatedRequest(adminAcmeCookie), String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
@@ -72,14 +72,14 @@ class GetUserIntegrationTest extends AbstractIntegrationTest {
         String adminCookie = signUpAndExtractCookie("Acme Logistics", "admin.acme", "adminPassword1");
 
         ResponseEntity<String> response = restTemplate.exchange(
-                "/auth/users/" + UUID.randomUUID(), HttpMethod.GET, authenticatedRequest(adminCookie), String.class);
+                "/auth/user/" + UUID.randomUUID(), HttpMethod.GET, authenticatedRequest(adminCookie), String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
     private ResponseEntity<UserResponse> getUser(String cookie, UUID userId) {
         return restTemplate.exchange(
-                "/auth/users/" + userId, HttpMethod.GET, authenticatedRequest(cookie), UserResponse.class);
+                "/auth/user/" + userId, HttpMethod.GET, authenticatedRequest(cookie), UserResponse.class);
     }
 
     private String signUpAndExtractCookie(String workspaceName, String userName, String password) {
@@ -88,10 +88,10 @@ class GetUserIntegrationTest extends AbstractIntegrationTest {
         return extractAccessTokenCookie(signUpResponse);
     }
 
-    private void createUser(String adminCookie, String userName, String password, String operatorId, Role role) {
-        CreateUserRequest createUser = new CreateUserRequest(userName, password, operatorId, role);
+    private void createUser(String adminCookie, String userName, String password, Role role) {
+        CreateUserRequest createUser = new CreateUserRequest(userName, password, role);
         HttpEntity<CreateUserRequest> request = authenticatedJsonRequest(adminCookie, createUser);
-        ResponseEntity<Void> response = restTemplate.postForEntity("/auth/users", request, Void.class);
+        ResponseEntity<Void> response = restTemplate.postForEntity("/auth/user", request, Void.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     }
 }

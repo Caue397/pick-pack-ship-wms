@@ -40,7 +40,7 @@ class SignUpIntegrationTest extends AbstractIntegrationTest {
 
         assertThat(jwt.getSubject()).isEqualTo(savedUser.get().getUserId().toString());
         assertThat(jwt.getClaimAsString("workspaceId")).isEqualTo(savedWorkspace.get().getWorkspaceId().toString());
-        assertThat(jwt.getClaimAsString("operatorId")).isEqualTo(savedUser.get().getOperatorId());
+        assertThat(jwt.getClaimAsString("operatorId")).isEqualTo(savedUser.get().getOperatorId().toString());
         assertThat(jwt.getClaimAsString("role")).isEqualTo("ADMIN");
         assertThat(jwt.getExpiresAt()).isAfter(Instant.now());
     }

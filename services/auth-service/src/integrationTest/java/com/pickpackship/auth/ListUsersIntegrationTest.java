@@ -21,14 +21,14 @@ class ListUsersIntegrationTest extends AbstractIntegrationTest {
     @Test
     void adminListsOnlyUsersFromOwnWorkspace() {
         String adminCookie = signUpAndExtractCookie("Acme Logistics", "admin.acme", "adminPassword1");
-        createUser(adminCookie, "picker.acme", "pickerPassword1", "OP-001", Role.PICKER);
+        createUser(adminCookie, "picker.acme", "pickerPassword1", Role.PICKER);
 
         // Second workspace: must not leak into the first workspace's listing.
         signUpAndExtractCookie("Globex", "admin.globex", "adminPassword1");
 
         HttpEntity<Void> listRequest = authenticatedRequest(adminCookie);
         ResponseEntity<List<UserResponse>> response = restTemplate.exchange(
-                "/auth/users", HttpMethod.GET, listRequest, new ParameterizedTypeReference<>() {});
+                "/auth/user", HttpMethod.GET, listRequest, new ParameterizedTypeReference<>() {});
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody())
@@ -41,7 +41,7 @@ class ListUsersIntegrationTest extends AbstractIntegrationTest {
     @Test
     void nonAdminCannotListUsers() {
         String adminCookie = signUpAndExtractCookie("Acme Logistics", "admin.acme", "adminPassword1");
-        createUser(adminCookie, "picker.acme", "pickerPassword1", "OP-001", Role.PICKER);
+        createUser(adminCookie, "picker.acme", "pickerPassword1", Role.PICKER);
 
         LoginRequest pickerLogin = new LoginRequest("picker.acme", "pickerPassword1");
         ResponseEntity<Void> pickerLoginResponse = restTemplate.postForEntity("/auth/login", pickerLogin, Void.class);
@@ -49,7 +49,7 @@ class ListUsersIntegrationTest extends AbstractIntegrationTest {
 
         HttpEntity<Void> listRequest = authenticatedRequest(pickerCookie);
         ResponseEntity<String> response = restTemplate.exchange(
-                "/auth/users", HttpMethod.GET, listRequest, String.class);
+                "/auth/user", HttpMethod.GET, listRequest, String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     }
@@ -60,10 +60,10 @@ class ListUsersIntegrationTest extends AbstractIntegrationTest {
         return extractAccessTokenCookie(signUpResponse);
     }
 
-    private void createUser(String adminCookie, String userName, String password, String operatorId, Role role) {
-        CreateUserRequest createUser = new CreateUserRequest(userName, password, operatorId, role);
+    private void createUser(String adminCookie, String userName, String password, Role role) {
+        CreateUserRequest createUser = new CreateUserRequest(userName, password, role);
         HttpEntity<CreateUserRequest> request = authenticatedJsonRequest(adminCookie, createUser);
-        ResponseEntity<Void> response = restTemplate.postForEntity("/auth/users", request, Void.class);
+        ResponseEntity<Void> response = restTemplate.postForEntity("/auth/user", request, Void.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     }
 }
