@@ -49,7 +49,7 @@ class JwtAuthenticationFilterTest {
     @Test
     void rejectsProtectedRouteWithoutToken() {
         MockServerWebExchange exchange = MockServerWebExchange.from(
-                MockServerHttpRequest.get("/api/orders/123"));
+                MockServerHttpRequest.get("/order/123"));
 
         filter.filter(exchange, ex -> Mono.empty()).block();
 
@@ -68,7 +68,7 @@ class JwtAuthenticationFilterTest {
                 .compact();
 
         MockServerWebExchange exchange = MockServerWebExchange.from(
-                MockServerHttpRequest.get("/api/orders/123")
+                MockServerHttpRequest.get("/order/123")
                         .header("Authorization", "Bearer " + expired));
 
         filter.filter(exchange, ex -> Mono.empty()).block();
@@ -86,7 +86,7 @@ class JwtAuthenticationFilterTest {
                 .compact();
 
         MockServerWebExchange exchange = MockServerWebExchange.from(
-                MockServerHttpRequest.get("/api/orders/123")
+                MockServerHttpRequest.get("/order/123")
                         .header("Authorization", "Bearer " + token));
 
         filter.filter(exchange, ex -> Mono.empty()).block();
@@ -106,7 +106,7 @@ class JwtAuthenticationFilterTest {
                 .compact();
 
         MockServerWebExchange exchange = MockServerWebExchange.from(
-                MockServerHttpRequest.get("/api/orders/123")
+                MockServerHttpRequest.get("/order/123")
                         .header("Authorization", "Bearer " + token));
 
         AtomicReference<ServerHttpRequest> forwardedRequest = new AtomicReference<>();
@@ -130,7 +130,7 @@ class JwtAuthenticationFilterTest {
                 .compact();
 
         MockServerWebExchange exchange = MockServerWebExchange.from(
-                MockServerHttpRequest.get("/api/orders/123")
+                MockServerHttpRequest.get("/order/123")
                         .cookie(new org.springframework.http.HttpCookie("access_token", token)));
 
         AtomicReference<ServerHttpRequest> forwardedRequest = new AtomicReference<>();
@@ -145,7 +145,7 @@ class JwtAuthenticationFilterTest {
     @Test
     void rejectsMissingAuthorizationHeaderFormat() {
         MockServerWebExchange exchange = MockServerWebExchange.from(
-                MockServerHttpRequest.get("/api/orders/123")
+                MockServerHttpRequest.get("/order/123")
                         .header("Authorization", "not-a-bearer-token"));
 
         filter.filter(exchange, ex -> Mono.empty()).block();
