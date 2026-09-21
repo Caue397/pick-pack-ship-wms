@@ -1,6 +1,7 @@
 package com.pickpackship.order.service;
 
 import com.pickpackship.order.api.dto.CreateSellerRequest;
+import com.pickpackship.order.api.dto.SellerFilter;
 import com.pickpackship.order.api.dto.SellerResponse;
 import com.pickpackship.order.api.dto.UpdateSellerRequest;
 import com.pickpackship.order.domain.Seller;
@@ -9,12 +10,15 @@ import com.pickpackship.order.exception.SellerHasOrdersException;
 import com.pickpackship.order.exception.SellerNotExistsException;
 import com.pickpackship.order.repository.OrderRepository;
 import com.pickpackship.order.repository.SellerRepository;
+import com.pickpackship.order.repository.SellerSpecifications;
 import com.pickpackship.order.security.AuthenticatedUser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -24,11 +28,15 @@ public class SellerService {
     private final SellerRepository sellerRepository;
     private final OrderRepository orderRepository;
 
-    public List<SellerResponse> listSellers(AuthenticatedUser caller) {
-        return sellerRepository.findByWorkspaceId(caller.workspaceId())
-                .stream()
-                .map(this::toResponse)
-                .toList();
+    public Page<SellerResponse> listSellers(Pageable pageable, SellerFilter filter, AuthenticatedUser caller) {
+        Specification<Seller> spec = Specification
+                .where(SellerSpecifications.hasWorkspaceId(caller.workspaceId()))
+                .and(SellerSpecifications.hasName(filter.name()))
+                .and(SellerSpecifications.hasDocument(filter.document()));
+
+        Page<Seller> sellers = sellerRepository.findAll(spec, pageable);
+
+        return sellers.map(this::toResponse);
     }
 
     public SellerResponse createSeller(CreateSellerRequest request, AuthenticatedUser caller) {

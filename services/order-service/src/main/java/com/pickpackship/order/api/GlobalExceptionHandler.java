@@ -1,6 +1,9 @@
 package com.pickpackship.order.api;
 
+import com.pickpackship.order.exception.DuplicateSellerDocumentException;
 import com.pickpackship.order.exception.OrderNotFoundException;
+import com.pickpackship.order.exception.SellerHasOrdersException;
+import com.pickpackship.order.exception.SellerNotExistsException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
@@ -32,6 +35,21 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(OrderNotFoundException.class)
     public ProblemDetail handleOrderNotFound(OrderNotFoundException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
+    @ExceptionHandler(SellerNotExistsException.class)
+    public ProblemDetail handleSellerNotExists(SellerNotExistsException ex) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
+    @ExceptionHandler(DuplicateSellerDocumentException.class)
+    public ProblemDetail handleDuplicateSellerDocument(DuplicateSellerDocumentException ex) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
+    @ExceptionHandler(SellerHasOrdersException.class)
+    public ProblemDetail handleSellerHasOrders(SellerHasOrdersException ex) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
     }
 
     @ExceptionHandler(AccessDeniedException.class)

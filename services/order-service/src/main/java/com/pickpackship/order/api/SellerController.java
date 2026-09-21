@@ -1,12 +1,15 @@
 package com.pickpackship.order.api;
 
 import com.pickpackship.order.api.dto.CreateSellerRequest;
+import com.pickpackship.order.api.dto.SellerFilter;
 import com.pickpackship.order.api.dto.SellerResponse;
 import com.pickpackship.order.api.dto.UpdateSellerRequest;
 import com.pickpackship.order.security.AuthenticatedUser;
 import com.pickpackship.order.service.SellerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,7 +17,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -24,11 +26,13 @@ public class SellerController {
     private final SellerService sellerService;
 
     @GetMapping
-    public ResponseEntity<List<SellerResponse>> listSellers(
-            @AuthenticationPrincipal Jwt jwt
+    public ResponseEntity<Page<SellerResponse>> listSellers(
+            @AuthenticationPrincipal Jwt jwt,
+            Pageable pageable,
+            @ModelAttribute SellerFilter filter
     ) {
         AuthenticatedUser caller = AuthenticatedUser.from(jwt);
-        return ResponseEntity.ok(sellerService.listSellers(caller));
+        return ResponseEntity.ok(sellerService.listSellers(pageable, filter, caller));
     }
 
     @PostMapping

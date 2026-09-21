@@ -60,6 +60,10 @@ public class Order {
     @Column(name = "seller", nullable = false)
     private UUID seller;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "seller", insertable = false, updatable = false)
+    private Seller sellerRef;
+
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "name", column = @Column(name = "sender_name")),

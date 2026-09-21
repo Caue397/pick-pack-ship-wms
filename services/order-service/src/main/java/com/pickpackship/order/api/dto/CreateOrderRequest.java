@@ -11,8 +11,8 @@ import java.util.UUID;
 
 public record CreateOrderRequest(
         @NotBlank(message = "Customer name is required") String customerName,
-        @NotBlank(message = "Seller is required") UUID seller,
-        @NotBlank(message = "Order number is required") Long orderNumber,
+        @NotNull(message = "Seller is required") UUID seller,
+        @NotNull(message = "Order number is required") Long orderNumber,
         @NotNull(message = "Sender is required") @Valid Party sender,
         @NotNull(message = "Recipient is required") @Valid Party recipient,
         @NotEmpty(message = "The items cannot be empty") Map<String, Integer> items
