@@ -54,15 +54,15 @@ public class OrderService {
             throw new SellerNotExistsException();
         }
 
-        Order order = Order.build(
-                caller.workspaceId(),
-                request.customerName(),
-                request.orderNumber(),
-                request.seller(),
-                request.sender(),
-                request.recipient(),
-                request.items()
-        );
+        Order order = Order.builder()
+                .workspaceId(caller.workspaceId())
+                .customerName(request.customerName())
+                .orderNumber(request.orderNumber())
+                .seller(request.seller())
+                .sender(request.sender())
+                .recipient(request.recipient())
+                .items(request.items())
+                .build();
 
         orderRepository.save(order);
 

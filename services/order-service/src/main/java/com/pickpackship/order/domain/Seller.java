@@ -2,6 +2,8 @@ package com.pickpackship.order.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -19,20 +21,10 @@ import java.util.UUID;
         )
 )
 @Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Seller {
-
-    public static Seller build(
-            UUID workspaceId,
-            String name,
-            String document
-    ) {
-        Seller seller = new Seller();
-        seller.workspaceId = workspaceId;
-        seller.name = name;
-        seller.document = document;
-        return seller;
-    }
 
     public void rename(String name) {
         this.name = name;

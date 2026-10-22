@@ -44,11 +44,11 @@ public class SellerService {
             throw new DuplicateSellerDocumentException();
         }
 
-        Seller seller = Seller.build(
-                caller.workspaceId(),
-                request.name(),
-                request.document()
-        );
+        Seller seller = Seller.builder()
+                .workspaceId(caller.workspaceId())
+                .name(request.name())
+                .document(request.document())
+                .build();
 
         sellerRepository.save(seller);
 

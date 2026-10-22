@@ -2,6 +2,8 @@ package com.pickpackship.order.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -14,29 +16,10 @@ import java.util.UUID;
 @Entity
 @Table(name = "orders")
 @Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Order {
-
-    public static Order build(
-        UUID workspaceId,
-        String customerName,
-        Long orderNumber,
-        UUID seller,
-        Party sender,
-        Party recipient,
-        Map<String, Integer> items
-    ) {
-        Order order = new Order();
-        order.workspaceId = workspaceId;
-        order.customerName = customerName;
-        order.orderNumber = orderNumber;
-        order.seller = seller;
-        order.sender = sender;
-        order.recipient = recipient;
-        order.items = items;
-        order.status = OrderStatus.CREATED;
-        return order;
-    }
 
     public void cancel(String cancellationReason) {
         this.status = OrderStatus.CANCELLED;
@@ -99,9 +82,10 @@ public class Order {
     @Column(name = "quantity")
     private Map<String, Integer> items;
 
+    @Builder.Default
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private OrderStatus status;
+    private OrderStatus status = OrderStatus.CREATED;
 
     @Column(name = "cancellation_reason")
     private String cancellationReason;
