@@ -23,7 +23,11 @@ class CreateOrderIntegrationTest extends AbstractIntegrationTest {
     @Test
     void creatingOrderPersistsItAndWritesCreatedOutboxEvent() {
         UUID workspaceId = UUID.randomUUID();
-        Seller seller = sellerRepository.save(Seller.build(workspaceId, "Acme Sellers", "12345678900"));
+        Seller seller = sellerRepository.save(Seller.builder()
+            .workspaceId(workspaceId)
+            .name("Acme Sellers")
+            .document("12345678900")
+            .build());
         String adminCookie = cookiePairFor(UUID.randomUUID(), "OP-001", workspaceId, "ADMIN");
 
         CreateOrderRequest request = validRequest(seller.getSellerId(), 1001L, Map.of("SKU-1", 2));
@@ -70,7 +74,11 @@ class CreateOrderIntegrationTest extends AbstractIntegrationTest {
     @Test
     void creatingOrderWithoutItemsIsRejected() {
         UUID workspaceId = UUID.randomUUID();
-        Seller seller = sellerRepository.save(Seller.build(workspaceId, "Acme Sellers", "12345678900"));
+        Seller seller = sellerRepository.save(Seller.builder()
+            .workspaceId(workspaceId)
+            .name("Acme Sellers")
+            .document("12345678900")
+            .build());
         String adminCookie = cookiePairFor(UUID.randomUUID(), "OP-001", workspaceId, "ADMIN");
 
         CreateOrderRequest request = validRequest(seller.getSellerId(), 1003L, Map.of());
@@ -95,7 +103,11 @@ class CreateOrderIntegrationTest extends AbstractIntegrationTest {
     @Test
     void nonAdminCannotCreateOrder() {
         UUID workspaceId = UUID.randomUUID();
-        Seller seller = sellerRepository.save(Seller.build(workspaceId, "Acme Sellers", "12345678900"));
+        Seller seller = sellerRepository.save(Seller.builder()
+            .workspaceId(workspaceId)
+            .name("Acme Sellers")
+            .document("12345678900")
+            .build());
         String pickerCookie = cookiePairFor(UUID.randomUUID(), "OP-001", workspaceId, "PICKER");
 
         CreateOrderRequest request = validRequest(seller.getSellerId(), 1005L, Map.of("SKU-1", 1));

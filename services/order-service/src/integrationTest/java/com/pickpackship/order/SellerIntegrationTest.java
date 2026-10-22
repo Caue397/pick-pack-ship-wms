@@ -60,7 +60,11 @@ class SellerIntegrationTest extends AbstractIntegrationTest {
     @Test
     void creatingSellerWithDuplicateDocumentIsRejected() {
         UUID workspaceId = UUID.randomUUID();
-        sellerRepository.save(Seller.build(workspaceId, "Existing Seller", "12345678900"));
+        sellerRepository.save(Seller.builder()
+            .workspaceId(workspaceId)
+            .name("Existing Seller")
+            .document("12345678900")
+            .build());
         String adminCookie = cookiePairFor(UUID.randomUUID(), "OP-001", workspaceId, "ADMIN");
 
         CreateSellerRequest request = new CreateSellerRequest("Acme Sellers", "12345678900");
@@ -74,8 +78,16 @@ class SellerIntegrationTest extends AbstractIntegrationTest {
     void listSellersOnlyReturnsCallersWorkspace() {
         UUID workspaceA = UUID.randomUUID();
         UUID workspaceB = UUID.randomUUID();
-        sellerRepository.save(Seller.build(workspaceA, "Seller A", "11111111111"));
-        sellerRepository.save(Seller.build(workspaceB, "Seller B", "22222222222"));
+        sellerRepository.save(Seller.builder()
+            .workspaceId(workspaceA)
+            .name("Seller A")
+            .document("11111111111")
+            .build());
+        sellerRepository.save(Seller.builder()
+            .workspaceId(workspaceB)
+            .name("Seller B")
+            .document("22222222222")
+            .build());
         String cookie = cookiePairFor(UUID.randomUUID(), "OP-001", workspaceA, "ADMIN");
 
         ResponseEntity<SellerPage> response = restTemplate.exchange(
@@ -89,8 +101,16 @@ class SellerIntegrationTest extends AbstractIntegrationTest {
     @Test
     void listSellersCanFilterByNameIgnoringCase() {
         UUID workspaceId = UUID.randomUUID();
-        sellerRepository.save(Seller.build(workspaceId, "Acme Sellers", "11111111111"));
-        sellerRepository.save(Seller.build(workspaceId, "Globex Trading", "22222222222"));
+        sellerRepository.save(Seller.builder()
+            .workspaceId(workspaceId)
+            .name("Acme Sellers")
+            .document("11111111111")
+            .build());
+        sellerRepository.save(Seller.builder()
+            .workspaceId(workspaceId)
+            .name("Globex Trading")
+            .document("22222222222")
+            .build());
         String cookie = cookiePairFor(UUID.randomUUID(), "OP-001", workspaceId, "ADMIN");
 
         ResponseEntity<SellerPage> response = restTemplate.exchange(
@@ -103,8 +123,16 @@ class SellerIntegrationTest extends AbstractIntegrationTest {
     @Test
     void listSellersCanFilterByDocument() {
         UUID workspaceId = UUID.randomUUID();
-        sellerRepository.save(Seller.build(workspaceId, "Acme Sellers", "11111111111"));
-        sellerRepository.save(Seller.build(workspaceId, "Globex Trading", "22222222222"));
+        sellerRepository.save(Seller.builder()
+            .workspaceId(workspaceId)
+            .name("Acme Sellers")
+            .document("11111111111")
+            .build());
+        sellerRepository.save(Seller.builder()
+            .workspaceId(workspaceId)
+            .name("Globex Trading")
+            .document("22222222222")
+            .build());
         String cookie = cookiePairFor(UUID.randomUUID(), "OP-001", workspaceId, "ADMIN");
 
         ResponseEntity<SellerPage> response = restTemplate.exchange(
@@ -118,8 +146,16 @@ class SellerIntegrationTest extends AbstractIntegrationTest {
     @Test
     void listSellersFiltersAreCombined() {
         UUID workspaceId = UUID.randomUUID();
-        sellerRepository.save(Seller.build(workspaceId, "Acme Sellers", "11111111111"));
-        sellerRepository.save(Seller.build(workspaceId, "Acme Logistics", "22222222222"));
+        sellerRepository.save(Seller.builder()
+            .workspaceId(workspaceId)
+            .name("Acme Sellers")
+            .document("11111111111")
+            .build());
+        sellerRepository.save(Seller.builder()
+            .workspaceId(workspaceId)
+            .name("Acme Logistics")
+            .document("22222222222")
+            .build());
         String cookie = cookiePairFor(UUID.randomUUID(), "OP-001", workspaceId, "ADMIN");
 
         ResponseEntity<SellerPage> response = restTemplate.exchange(
@@ -134,7 +170,11 @@ class SellerIntegrationTest extends AbstractIntegrationTest {
     void listSellersFilterNeverLeaksAnotherWorkspace() {
         UUID workspaceA = UUID.randomUUID();
         UUID workspaceB = UUID.randomUUID();
-        sellerRepository.save(Seller.build(workspaceB, "Acme Sellers", "11111111111"));
+        sellerRepository.save(Seller.builder()
+            .workspaceId(workspaceB)
+            .name("Acme Sellers")
+            .document("11111111111")
+            .build());
         String cookie = cookiePairFor(UUID.randomUUID(), "OP-001", workspaceA, "ADMIN");
 
         ResponseEntity<SellerPage> response = restTemplate.exchange(
@@ -148,9 +188,21 @@ class SellerIntegrationTest extends AbstractIntegrationTest {
     @Test
     void listSellersIsPaginated() {
         UUID workspaceId = UUID.randomUUID();
-        sellerRepository.save(Seller.build(workspaceId, "Acme Sellers", "11111111111"));
-        sellerRepository.save(Seller.build(workspaceId, "Globex Trading", "22222222222"));
-        sellerRepository.save(Seller.build(workspaceId, "Zenith Supply", "33333333333"));
+        sellerRepository.save(Seller.builder()
+            .workspaceId(workspaceId)
+            .name("Acme Sellers")
+            .document("11111111111")
+            .build());
+        sellerRepository.save(Seller.builder()
+            .workspaceId(workspaceId)
+            .name("Globex Trading")
+            .document("22222222222")
+            .build());
+        sellerRepository.save(Seller.builder()
+            .workspaceId(workspaceId)
+            .name("Zenith Supply")
+            .document("33333333333")
+            .build());
         String cookie = cookiePairFor(UUID.randomUUID(), "OP-001", workspaceId, "ADMIN");
 
         ResponseEntity<SellerPage> response = restTemplate.exchange(
@@ -167,9 +219,21 @@ class SellerIntegrationTest extends AbstractIntegrationTest {
     @Test
     void listSellersReturnsRequestedPage() {
         UUID workspaceId = UUID.randomUUID();
-        sellerRepository.save(Seller.build(workspaceId, "Acme Sellers", "11111111111"));
-        sellerRepository.save(Seller.build(workspaceId, "Globex Trading", "22222222222"));
-        sellerRepository.save(Seller.build(workspaceId, "Zenith Supply", "33333333333"));
+        sellerRepository.save(Seller.builder()
+            .workspaceId(workspaceId)
+            .name("Acme Sellers")
+            .document("11111111111")
+            .build());
+        sellerRepository.save(Seller.builder()
+            .workspaceId(workspaceId)
+            .name("Globex Trading")
+            .document("22222222222")
+            .build());
+        sellerRepository.save(Seller.builder()
+            .workspaceId(workspaceId)
+            .name("Zenith Supply")
+            .document("33333333333")
+            .build());
         String cookie = cookiePairFor(UUID.randomUUID(), "OP-001", workspaceId, "ADMIN");
 
         ResponseEntity<SellerPage> response = restTemplate.exchange(
@@ -184,9 +248,21 @@ class SellerIntegrationTest extends AbstractIntegrationTest {
     @Test
     void listSellersCanBeSortedByName() {
         UUID workspaceId = UUID.randomUUID();
-        sellerRepository.save(Seller.build(workspaceId, "Acme Sellers", "11111111111"));
-        sellerRepository.save(Seller.build(workspaceId, "Globex Trading", "22222222222"));
-        sellerRepository.save(Seller.build(workspaceId, "Zenith Supply", "33333333333"));
+        sellerRepository.save(Seller.builder()
+            .workspaceId(workspaceId)
+            .name("Acme Sellers")
+            .document("11111111111")
+            .build());
+        sellerRepository.save(Seller.builder()
+            .workspaceId(workspaceId)
+            .name("Globex Trading")
+            .document("22222222222")
+            .build());
+        sellerRepository.save(Seller.builder()
+            .workspaceId(workspaceId)
+            .name("Zenith Supply")
+            .document("33333333333")
+            .build());
         String cookie = cookiePairFor(UUID.randomUUID(), "OP-001", workspaceId, "ADMIN");
 
         ResponseEntity<SellerPage> response = restTemplate.exchange(
@@ -201,9 +277,21 @@ class SellerIntegrationTest extends AbstractIntegrationTest {
     @Test
     void listSellersPaginationCountsOnlyFilteredSellers() {
         UUID workspaceId = UUID.randomUUID();
-        sellerRepository.save(Seller.build(workspaceId, "Acme Sellers", "11111111111"));
-        sellerRepository.save(Seller.build(workspaceId, "Acme Logistics", "22222222222"));
-        sellerRepository.save(Seller.build(workspaceId, "Globex Trading", "33333333333"));
+        sellerRepository.save(Seller.builder()
+            .workspaceId(workspaceId)
+            .name("Acme Sellers")
+            .document("11111111111")
+            .build());
+        sellerRepository.save(Seller.builder()
+            .workspaceId(workspaceId)
+            .name("Acme Logistics")
+            .document("22222222222")
+            .build());
+        sellerRepository.save(Seller.builder()
+            .workspaceId(workspaceId)
+            .name("Globex Trading")
+            .document("33333333333")
+            .build());
         String cookie = cookiePairFor(UUID.randomUUID(), "OP-001", workspaceId, "ADMIN");
 
         ResponseEntity<SellerPage> response = restTemplate.exchange(
@@ -219,7 +307,11 @@ class SellerIntegrationTest extends AbstractIntegrationTest {
     @Test
     void adminCanRenameSellerFromOwnWorkspace() {
         UUID workspaceId = UUID.randomUUID();
-        Seller seller = sellerRepository.save(Seller.build(workspaceId, "Old Name", "33333333333"));
+        Seller seller = sellerRepository.save(Seller.builder()
+            .workspaceId(workspaceId)
+            .name("Old Name")
+            .document("33333333333")
+            .build());
         String adminCookie = cookiePairFor(UUID.randomUUID(), "OP-001", workspaceId, "ADMIN");
 
         UpdateSellerRequest request = new UpdateSellerRequest("New Name");
@@ -234,7 +326,11 @@ class SellerIntegrationTest extends AbstractIntegrationTest {
     @Test
     void adminCannotRenameSellerFromAnotherWorkspace() {
         UUID ownerWorkspace = UUID.randomUUID();
-        Seller seller = sellerRepository.save(Seller.build(ownerWorkspace, "Old Name", "44444444444"));
+        Seller seller = sellerRepository.save(Seller.builder()
+            .workspaceId(ownerWorkspace)
+            .name("Old Name")
+            .document("44444444444")
+            .build());
         String otherAdminCookie = cookiePairFor(UUID.randomUUID(), "OP-002", UUID.randomUUID(), "ADMIN");
 
         UpdateSellerRequest request = new UpdateSellerRequest("Hijacked Name");
@@ -248,7 +344,11 @@ class SellerIntegrationTest extends AbstractIntegrationTest {
     @Test
     void adminCanDeleteSellerWithoutOrders() {
         UUID workspaceId = UUID.randomUUID();
-        Seller seller = sellerRepository.save(Seller.build(workspaceId, "Deletable", "55555555555"));
+        Seller seller = sellerRepository.save(Seller.builder()
+            .workspaceId(workspaceId)
+            .name("Deletable")
+            .document("55555555555")
+            .build());
         String adminCookie = cookiePairFor(UUID.randomUUID(), "OP-001", workspaceId, "ADMIN");
 
         ResponseEntity<Void> response = restTemplate.exchange(
@@ -262,11 +362,22 @@ class SellerIntegrationTest extends AbstractIntegrationTest {
     @Test
     void adminCannotDeleteSellerWithExistingOrders() {
         UUID workspaceId = UUID.randomUUID();
-        Seller seller = sellerRepository.save(Seller.build(workspaceId, "Has Orders", "66666666666"));
+        Seller seller = sellerRepository.save(Seller.builder()
+            .workspaceId(workspaceId)
+            .name("Has Orders")
+            .document("66666666666")
+            .build());
         Address address = new Address("Main St", "100", "Downtown", "Springfield", "SP", "01000-000");
         Party party = new Party("John Doe", "99988877766", address);
-        orderRepository.save(Order.build(
-                workspaceId, "John Doe", 7001L, seller.getSellerId(), party, party, Map.of("SKU-1", 1)));
+        orderRepository.save(Order.builder()
+            .workspaceId(workspaceId)
+            .customerName("John Doe")
+            .orderNumber(7001L)
+            .seller(seller.getSellerId())
+            .sender(party)
+            .recipient(party)
+            .items(Map.of("SKU-1", 1))
+            .build());
         String adminCookie = cookiePairFor(UUID.randomUUID(), "OP-001", workspaceId, "ADMIN");
 
         ResponseEntity<String> response = restTemplate.exchange(

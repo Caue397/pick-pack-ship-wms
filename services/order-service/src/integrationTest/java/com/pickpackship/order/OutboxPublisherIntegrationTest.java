@@ -40,7 +40,11 @@ class OutboxPublisherIntegrationTest extends AbstractIntegrationTest {
     @Test
     void orderCreatedEventIsWrittenToOutboxAndPublishedToKafka() {
         UUID workspaceId = UUID.randomUUID();
-        Seller seller = sellerRepository.save(Seller.build(workspaceId, "Acme Sellers", UUID.randomUUID().toString()));
+        Seller seller = sellerRepository.save(Seller.builder()
+            .workspaceId(workspaceId)
+            .name("Acme Sellers")
+            .document(UUID.randomUUID().toString())
+            .build());
         String cookie = cookiePairFor(UUID.randomUUID(), "OP-001", workspaceId, "ADMIN");
 
         CreateOrderRequest request =
@@ -58,7 +62,11 @@ class OutboxPublisherIntegrationTest extends AbstractIntegrationTest {
     @Test
     void orderCancelledEventIsWrittenToOutboxAndPublishedToKafka() {
         UUID workspaceId = UUID.randomUUID();
-        Seller seller = sellerRepository.save(Seller.build(workspaceId, "Acme Sellers", UUID.randomUUID().toString()));
+        Seller seller = sellerRepository.save(Seller.builder()
+            .workspaceId(workspaceId)
+            .name("Acme Sellers")
+            .document(UUID.randomUUID().toString())
+            .build());
         String cookie = cookiePairFor(UUID.randomUUID(), "OP-001", workspaceId, "ADMIN");
 
         CreateOrderRequest createRequest =

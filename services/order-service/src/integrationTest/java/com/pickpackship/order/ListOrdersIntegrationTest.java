@@ -57,11 +57,22 @@ class ListOrdersIntegrationTest extends AbstractIntegrationTest {
     }
 
     private Order newOrder(UUID workspaceId, long orderNumber) {
-        Seller seller = sellerRepository.save(Seller.build(workspaceId, "Acme Sellers", UUID.randomUUID().toString()));
+        Seller seller = sellerRepository.save(Seller.builder()
+            .workspaceId(workspaceId)
+            .name("Acme Sellers")
+            .document(UUID.randomUUID().toString())
+            .build());
         Address address = new Address("Main St", "100", "Downtown", "Springfield", "SP", "01000-000");
         Party party = new Party("John Doe", "99988877766", address);
-        Order order = Order.build(
-                workspaceId, "John Doe", orderNumber, seller.getSellerId(), party, party, Map.of("SKU-1", 1));
+        Order order = Order.builder()
+            .workspaceId(workspaceId)
+            .customerName("John Doe")
+            .orderNumber(orderNumber)
+            .seller(seller.getSellerId())
+            .sender(party)
+            .recipient(party)
+            .items(Map.of("SKU-1", 1))
+            .build();
         return orderRepository.save(order);
     }
 }
