@@ -13,6 +13,8 @@ import java.time.Instant;
 import java.util.UUID;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -21,24 +23,10 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Entity
 @Table(name = "users")
 @Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class User {
-
-    public static User build(
-        UUID workspaceId,
-        String userName,
-        String passwordHash,
-        UUID operatorId,
-        Role role
-    ) {
-        User user = new User();
-        user.workspaceId = workspaceId;
-        user.userName = userName;
-        user.passwordHash = passwordHash;
-        user.operatorId = operatorId;
-        user.role = role;
-        return user;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

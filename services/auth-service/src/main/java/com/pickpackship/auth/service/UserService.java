@@ -22,13 +22,13 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     public User createUser(CreateUserRequest userToCreate, UUID workspaceId) {
-        User user = User.build(
-                workspaceId,
-                userToCreate.userName(),
-                passwordEncoder.encode(userToCreate.password()),
-                UUID.randomUUID(),
-                userToCreate.role()
-        );
+        User user = User.builder()
+                .workspaceId(workspaceId)
+                .userName(userToCreate.userName())
+                .passwordHash(passwordEncoder.encode(userToCreate.password()))
+                .operatorId(UUID.randomUUID())
+                .role(userToCreate.role())
+                .build();
 
         userRepository.save(user);
 

@@ -38,7 +38,7 @@ public class AuthService {
             throw new DuplicateUserNameException();
         }
 
-        Workspace workspace = Workspace.build(request.workspaceName());
+        Workspace workspace = Workspace.builder().name(request.workspaceName()).build();
         workspaceRepository.save(workspace);
 
         CreateUserRequest payload = new CreateUserRequest(

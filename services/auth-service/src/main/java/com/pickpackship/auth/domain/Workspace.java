@@ -12,16 +12,10 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Entity
 @Table(name = "workspaces")
 @Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Workspace {
-
-    public static Workspace build(
-            String name
-    ) {
-        Workspace workspace = new Workspace();
-        workspace.name = name;
-        return workspace;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
